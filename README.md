@@ -1,2 +1,5 @@
 # celestial-informer
-A Message Push System for Celestial Empire
+A Message Delivery System for Celestial Empire
+
+## License
+GPL v2
