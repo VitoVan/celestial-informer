@@ -148,17 +148,22 @@
         "login error")))
 
 (defun send-login-email(email token)
-  (send-email *email-server* *email-account*  email "Login Into Your Account"
-              (concatenate 'string *server-path* "user/login?email=" email "&token=" token)
-              :authentication '(:login *email-account* *email-pwd*)
-              :display-name *email-dname*))
+  (handler-case
+      (progn (send-email *email-server* *email-account*  email "Login Into Your Account"
+                         (concatenate 'string *server-path* "user/login?email=" email "&token=" token)
+                         :authentication '(:login *email-account* *email-pwd*)
+                         :display-name *email-dname*)
+             "mail sent")
+    (error
+        (condition)
+      (format nil "~A" condition))))
 
 (defun ctl-request-login()
   (let* ((uid (parameter "email"))
          (new-token (db-new-token uid)))
     (and uid (if (numberp new-token)
                  (concatenate 'string "Please wait for " (write-to-string new-token) " seconds")
-                 (progn "mail sent")))))
+                 (send-login-email uid new-token)))))
 
 (setf *dispatch-table*
       (list
